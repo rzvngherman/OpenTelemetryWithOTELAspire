@@ -16,3 +16,5 @@ When you run an application, you want to know how well the app is performing and
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-with-otel
 
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
+
+https://learn.microsoft.com/en-us/dotnet/core/diagnostics/metrics-instrumentation
