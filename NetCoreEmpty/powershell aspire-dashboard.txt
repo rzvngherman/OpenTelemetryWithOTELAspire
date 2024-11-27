@@ -9,9 +9,8 @@ run this is powershell:
 --name aspire-dashboard `
 mcr.microsoft.com/dotnet/aspire-dashboard:latest
 
+3) run the webapi
 
-#open Aspire structure logs (take url for login: http://localhost:18888/login?t=... )
+4) open Aspire structure logs (take url for login: http://localhost:18888/login?t=... )
 
-3)
-run webapi 'NetCoreEmpty': endpoint HttpGet 'GetCpu'
-(path 'D:\work\local\OpenTelemetry\NetCoreEmpty')
+5) take a look on Metrics / Resource 'OTLP-Example' / 'cpu.usage'
