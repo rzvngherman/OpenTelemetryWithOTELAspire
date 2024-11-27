@@ -21,3 +21,12 @@ https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-with-ote
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
 
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/metrics-instrumentation
+
+
+
+# Example of Aspire Dashboard for cpu.usage
+
+
+
+![image](https://github.com/user-attachments/assets/fb590b92-d264-4034-9bf4-bf942f04fb7f)
+
