@@ -12,6 +12,9 @@ When you run an application, you want to know how well the app is performing and
 
 -> see file 'powershell aspire-dashboard.txt' for Aspire Dashboard
 
+-> 'PerformanceCounter' and 'PerformanceCounter.NextValue()' is only supported on: 'windows'. (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1416)
+
+
 # Documentation
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-with-otel
 
