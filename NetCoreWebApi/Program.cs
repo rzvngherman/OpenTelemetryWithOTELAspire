@@ -24,7 +24,9 @@ public class Program
         _meter.CreateObservableGauge<float>("cpu.usage", () => _cpuUsagePercent);
 
         //add timer
-        _timer = new System.Timers.Timer(1000);//1 second
+        double ms = 1000;
+        Console.WriteLine("Timer time: " + ms + "(ms)");
+        _timer = new System.Timers.Timer(ms);//1 second
         _timer.AutoReset = true;
         _timer.Elapsed += Timer_Elapsed;
     }
