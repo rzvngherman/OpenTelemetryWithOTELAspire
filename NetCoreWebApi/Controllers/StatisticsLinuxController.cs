@@ -23,11 +23,15 @@ public class StatisticsLinuxController  : ControllerBase
     [HttpGet]
     public async Task<StatisticsLinuxResponseModel> GetCpuUsageForLinuxEnvironment()
     {
-        // https://localhost:32770/StatisticsLinux
-        return new StatisticsLinuxResponseModel
+        await _linuxEnvironmentStatistics.OnStart(CancellationToken.None);
+        var res = new StatisticsLinuxResponseModel
         {
             CpuUsage = _linuxEnvironmentStatistics.CpuUsage!.Value + " %",
             MonitorPeriod = _linuxEnvironmentStatistics.MONITOR_PERIOD
         };
+        await _linuxEnvironmentStatistics.OnStop(CancellationToken.None);
+
+        // https://localhost:32770/StatisticsLinux
+        return res;
     }
 }

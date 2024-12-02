@@ -56,7 +56,7 @@ public class Program
         var x = new LinuxEnvironmentStatistics(factory);
         services.AddSingleton<LinuxEnvironmentStatistics>(x);
 
-        //start timer
-        await x.OnStart(CancellationToken.None);
+        //use this line on endpoint
+        //await x.OnStart(CancellationToken.None);
     }
 }
