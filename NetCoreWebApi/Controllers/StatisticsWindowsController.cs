@@ -28,16 +28,15 @@ public class StatisticsWindowsController : ControllerBase
     }
 
     [HttpGet]
-    public StatisticsResponseModel GetCpuUsageForWindowsEnvironment()
+    public StatisticsWindowsResponseModel GetCpuUsageForWindowsEnvironment()
     {
         float w = _performanceCounter.NextValue();
         _cpuUsagePercent = w;
 
         // https://localhost:7282/StatisticsWindows	
-        return new StatisticsResponseModel
+        return new StatisticsWindowsResponseModel
         {
             CpuUsage = w + " %",
-            MonitorPeriod = null
         };
     }
 }
