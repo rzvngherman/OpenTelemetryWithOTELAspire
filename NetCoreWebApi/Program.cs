@@ -1,110 +1,62 @@
-
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyModel;
+using OpenTelemetry.NetCore.Linux;
+using OpenTelemetry.NetCore.Windows;
+using Orleans.Statistics;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Text;
-using System.Timers;
 
 namespace OpenTelemetry.NetCore;
 
 public class Program
 {
-    private PerformanceCounter _cpuUsage;
-    private Meter _meter;
-    private System.Timers.Timer _timer;
-    private static float _cpuUsagePercent;
-
-    public Program()
-    {
-        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
-
-        _cpuUsage = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        _meter = new Meter("OTel.Example", "1.0.0");
-        _meter.CreateObservableGauge<float>("cpu.usage", () => _cpuUsagePercent);
-
-        //add timer
-        double ms = 1000;
-        Console.WriteLine("Timer time: " + ms + "(ms)");
-        _timer = new System.Timers.Timer(ms);//1 second
-        _timer.AutoReset = true;
-        _timer.Elapsed += Timer_Elapsed;
-    }
-
-    private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-    {
-        // Create a new Activity scoped to the method
-        float w = _cpuUsage.NextValue();
-        _cpuUsagePercent = w;
-
-        StringBuilder msg = new StringBuilder();
-        msg.AppendLine("CPU Usage: " + w + "%");
-        msg.AppendLine(DateTime.Now.ToString());
-
-        Console.WriteLine(msg.ToString());
-    }
-
-    private void DoMain(string[] args)
+    private static async Task Main(string[] args)
     {
         //builder
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        ConfigureOpenTelemetry(builder);
+        builder.Services.AddControllers();
+
+        if (OperatingSystem.IsWindows())
+        {
+            // Add services to the container.
+            // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
+            await AddWindowsStatistics(builder.Services);
+
+            //use timer:
+            //var app = new ProgramWindows(cpuUsage).DoMain(builder, args);
+        }
+        else
+        {
+            // Add services to the container.
+            // https://github.com/dotnet/orleans/blob/639be7f3e83262e70327b58892d6cf54c801b32d/src/Orleans.Core/Statistics/LinuxEnvironmentStatistics.cs
+            await AddLinuxStatistics(builder.Services);
+        }
 
         var app = builder.Build();
-
-       //start timer
-        _timer.Start();
+        app.MapControllers();
 
         app.Run();
-
-        //methods:
-        void ConfigureOpenTelemetry(WebApplicationBuilder builder)
-        {
-            // 5. Configure OpenTelemetry with the correct providers
-
-            // Setup logging to be exported via OpenTelemetry
-            builder.Logging.AddOpenTelemetry(logging =>
-            {
-                logging.IncludeFormattedMessage = true;
-                logging.IncludeScopes = true;
-            });
-
-            var otel = builder.Services.AddOpenTelemetry();
-
-            // Add Metrics for ASP.NET Core and our custom metrics and export via OTLP
-            otel.WithMetrics(metrics =>
-            {
-                // Metrics provider from OpenTelemetry
-                metrics.AddAspNetCoreInstrumentation();
-
-                //Our custom metrics
-                //metrics.AddMeter(_greeterMeter.Name);
-                metrics.AddMeter(_meter.Name);
-
-                // Metrics provides by ASP.NET Core in .NET 8
-                metrics.AddMeter("Microsoft.AspNetCore.Hosting");
-                metrics.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
-            });
-
-            // Add Tracing for ASP.NET Core and our custom ActivitySource and export via OTLP
-            otel.WithTracing(tracing =>
-            {
-                tracing.AddAspNetCoreInstrumentation();
-                tracing.AddHttpClientInstrumentation();
-            });
-
-            // Export OpenTelemetry data via OTLP, using env vars for the configuration
-            var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
-            if (otlpEndpoint != null)
-            {
-                otel.UseOtlpExporter();
-            }
-        }
     }
 
-    private static void Main(string[] args)
+    private static async Task AddWindowsStatistics(IServiceCollection services)
     {
-        new Program().DoMain(args);
+        var cpuUsage = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        services.AddSingleton<PerformanceCounter>(cpuUsage);
+
+        var meter = new Meter("OTel.Example", "1.0.0");
+        services.AddSingleton<Meter>(meter);
+    }
+
+    private static async Task AddLinuxStatistics(IServiceCollection services)
+    {
+        ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+        //ILogger logger = factory.CreateLogger("Program");
+        var x = new LinuxEnvironmentStatistics(factory);
+        services.AddSingleton<LinuxEnvironmentStatistics>(x);
+
+        //start timer
+        await x.OnStart(CancellationToken.None);
     }
 }
