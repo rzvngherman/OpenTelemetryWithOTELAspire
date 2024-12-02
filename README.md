@@ -14,6 +14,8 @@ When you run an application, you want to know how well the app is performing and
 
 -> 'PerformanceCounter' and 'PerformanceCounter.NextValue()' is only supported on: 'windows'. (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1416)
 
+-> Added suport for linux; added docker file; use class 'LinuxEnvironmentStatistics'. (https://github.com/dotnet/orleans/blob/639be7f3e83262e70327b58892d6cf54c801b32d/src/Orleans.Core/Statistics/LinuxEnvironmentStatistics.cs)
+
 
 # Documentation
 https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-with-otel
