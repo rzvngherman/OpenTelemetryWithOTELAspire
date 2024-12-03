@@ -1,4 +1,4 @@
-﻿namespace NetCoreWebApi.Models
+﻿namespace NetCoreWebApi.Models.Response
 {
     public class StatisticsWindowsResponseModel
     {

@@ -1,5 +1,5 @@
-﻿using NetCoreWebApi.Models;
-using OpenTelemetry.NetCore.Linux;
+﻿using NetCoreWebApi.Models.Linux;
+using NetCoreWebApi.Models.Response;
 
 namespace NetCoreWebApi.Service;
 

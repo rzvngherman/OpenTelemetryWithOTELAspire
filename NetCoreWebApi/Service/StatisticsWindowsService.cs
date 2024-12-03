@@ -1,4 +1,4 @@
-﻿using NetCoreWebApi.Models;
+﻿using NetCoreWebApi.Models.Response;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 

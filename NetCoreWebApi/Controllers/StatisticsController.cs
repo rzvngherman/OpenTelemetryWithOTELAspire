@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetCoreWebApi.Models;
+using NetCoreWebApi.Models.Response;
 using NetCoreWebApi.Service;
 
 namespace NetCoreWebApi.Controllers;
@@ -20,10 +20,7 @@ public class StatisticsController : ControllerBase
     [HttpGet]
     public async Task<StatisticsResponseModel> GetCpuUsageForEnvironment()
     {
-        //TODO - call '_statisticsService'
-        // https://softwareengineering.stackexchange.com/questions/345672/c-when-one-should-go-for-factory-method-pattern-instead-of-factory-pattern
-        // use 'ShipperFactory.CreateInstance(...)'
-        var  res = await _statisticsService.GetCpuUsageData();
-        return res;
+        var cpuUsageData = await _statisticsService.GetCpuUsageData();
+        return cpuUsageData;
     }
 }

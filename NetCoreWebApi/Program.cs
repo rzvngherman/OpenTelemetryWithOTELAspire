@@ -1,6 +1,6 @@
 ﻿using NetCoreWebApi;
+using NetCoreWebApi.Models.Linux;
 using NetCoreWebApi.Service;
-using OpenTelemetry.NetCore.Linux;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
