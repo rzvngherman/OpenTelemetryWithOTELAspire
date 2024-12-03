@@ -1,11 +1,10 @@
-﻿using NetCoreWebApi.Linux.Diagnostics.Metrics;
-using OpenTelemetry.NetCore.Linux.Diagnostics.Metrics;
+﻿using NetCoreWebApi.Models.Linux.Diagnostics.Metrics;
 using Orleans;
 using Orleans.Statistics;
 using System.Diagnostics.Metrics;
 using System.Text;
 
-namespace OpenTelemetry.NetCore.Linux;
+namespace NetCoreWebApi.Models.Linux;
 
 public class LinuxEnvironmentStatistics : IHostEnvironmentStatistics, ILifecycleObserver, IDisposable
 {
@@ -44,8 +43,8 @@ public class LinuxEnvironmentStatistics : IHostEnvironmentStatistics, ILifecycle
     public LinuxEnvironmentStatistics(ILoggerFactory loggerFactory)
     {
         _logger = loggerFactory.CreateLogger<LinuxEnvironmentStatistics>();
-        _totalPhysicalMemoryCounter = Instruments.Meter.CreateObservableCounter<long>(InstrumentNames.RUNTIME_MEMORY_TOTAL_PHYSICAL_MEMORY_MB, () => (long)(TotalPhysicalMemory / KB / KB), unit: "MB");
-        _availableMemoryCounter = Instruments.Meter.CreateObservableCounter<long>(InstrumentNames.RUNTIME_MEMORY_AVAILABLE_MEMORY_MB, () => (long)(AvailableMemory / KB / KB), unit: "MB");
+        _totalPhysicalMemoryCounter = Instruments.Meter.CreateObservableCounter(InstrumentNames.RUNTIME_MEMORY_TOTAL_PHYSICAL_MEMORY_MB, () => (long)(TotalPhysicalMemory / KB / KB), unit: "MB");
+        _availableMemoryCounter = Instruments.Meter.CreateObservableCounter(InstrumentNames.RUNTIME_MEMORY_AVAILABLE_MEMORY_MB, () => (long)(AvailableMemory / KB / KB), unit: "MB");
     }
 
     public void Dispose()
@@ -157,7 +156,7 @@ public class LinuxEnvironmentStatistics : IHostEnvironmentStatistics, ILifecycle
                 return;
             }
 
-            var currentCpuUsage = (1.0f - deltaIdleTime / ((float)deltaTotalTime)) * 100f;
+            var currentCpuUsage = (1.0f - deltaIdleTime / (float)deltaTotalTime) * 100f;
 
             var previousCpuUsage = CpuUsage ?? 0f;
             CpuUsage = (previousCpuUsage + 2 * currentCpuUsage) / 3;

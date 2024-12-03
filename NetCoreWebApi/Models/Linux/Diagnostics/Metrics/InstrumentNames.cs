@@ -1,4 +1,4 @@
-﻿namespace NetCoreWebApi.Linux.Diagnostics.Metrics;
+﻿namespace NetCoreWebApi.Models.Linux.Diagnostics.Metrics;
 
 internal static class InstrumentNames
 {

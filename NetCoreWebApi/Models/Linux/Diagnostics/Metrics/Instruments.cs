@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Metrics;
 
-namespace OpenTelemetry.NetCore.Linux.Diagnostics.Metrics;
+namespace NetCoreWebApi.Models.Linux.Diagnostics.Metrics;
 
 public static class Instruments
 {

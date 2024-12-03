@@ -1,9 +1,6 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyModel;
-using OpenTelemetry.NetCore.Linux;
-using OpenTelemetry.NetCore.Windows;
-using Orleans.Statistics;
+﻿using NetCoreWebApi;
+using NetCoreWebApi.Models.Linux;
+using NetCoreWebApi.Service;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
@@ -18,21 +15,15 @@ public class Program
 
         builder.Services.AddControllers();
 
-        if (OperatingSystem.IsWindows())
-        {
-            // Add services to the container.
-            // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
-            await AddWindowsStatistics(builder.Services);
+        //if (isWindows)
+        //{
+            //AddWindowsStatistics(builder.Services);
+        //}
+        
+        AddLinuxStatistics(builder.Services);
 
-            //use timer:
-            //var app = new ProgramWindows(cpuUsage).DoMain(builder, args);
-        }
-        else
-        {
-            // Add services to the container.
-            // https://github.com/dotnet/orleans/blob/639be7f3e83262e70327b58892d6cf54c801b32d/src/Orleans.Core/Statistics/LinuxEnvironmentStatistics.cs
-            await AddLinuxStatistics(builder.Services);
-        }
+        builder.Services.AddTransient<StatisticsServiceFactory>();
+        AddStatisticsService(builder.Services);
 
         var app = builder.Build();
         app.MapControllers();
@@ -40,8 +31,9 @@ public class Program
         app.Run();
     }
 
-    private static async Task AddWindowsStatistics(IServiceCollection services)
+    private static void AddWindowsStatistics(IServiceCollection services)
     {
+        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example
         var cpuUsage = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         services.AddSingleton<PerformanceCounter>(cpuUsage);
 
@@ -49,14 +41,24 @@ public class Program
         services.AddSingleton<Meter>(meter);
     }
 
-    private static async Task AddLinuxStatistics(IServiceCollection services)
+    private static void AddLinuxStatistics(IServiceCollection services)
     {
-        ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-        //ILogger logger = factory.CreateLogger("Program");
-        var x = new LinuxEnvironmentStatistics(factory);
-        services.AddSingleton<LinuxEnvironmentStatistics>(x);
+        var factory = LoggerFactory.Create(builder => builder.AddConsole());
+        var les = new LinuxEnvironmentStatistics(factory);
+        services.AddSingleton<LinuxEnvironmentStatistics>(les);
+    }
 
-        //start timer
-        await x.OnStart(CancellationToken.None);
+    private static void AddStatisticsService(IServiceCollection services)
+    {
+        var serviceProvider = services.BuildServiceProvider();
+        var statisticsServiceFactory = serviceProvider.GetRequiredService<StatisticsServiceFactory>();
+        var statisticsService = statisticsServiceFactory.GetRelayService(
+                                                             OperatingSystem.IsWindows() 
+                                                                ? EnvironmentType.Windows 
+                                                                : EnvironmentType.Linux);
+
+        //services.AddTransient<IStatisticsService, StatisticsLinuxService>();
+        //services.AddTransient<IStatisticsService, StatisticsWindowsService>();
+        services.AddSingleton<IStatisticsService>(statisticsService);
     }
 }
