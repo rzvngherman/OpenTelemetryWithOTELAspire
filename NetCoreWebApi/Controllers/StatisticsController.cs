@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NetCoreWebApi.Models;
 using NetCoreWebApi.Service;
-using OpenTelemetry.NetCore.Linux;
 
 namespace NetCoreWebApi.Controllers;
 
@@ -9,19 +8,22 @@ namespace NetCoreWebApi.Controllers;
 [ApiController]
 public class StatisticsController : ControllerBase
 {
-    private readonly ILogger<StatisticsLinuxController> _logger;
+    private readonly ILogger<StatisticsController> _logger;
     private readonly IStatisticsService _statisticsService;
 
-    public StatisticsController(ILogger<StatisticsLinuxController> logger, IStatisticsService statisticsService)
+    public StatisticsController(ILogger<StatisticsController> logger, IStatisticsService statisticsService)
     {
         _logger = logger;
         _statisticsService = statisticsService;
     }
 
     [HttpGet]
-    public StatisticsResponseModel GetCpuUsageForLinuxEnvironment()
+    public async Task<StatisticsResponseModel> GetCpuUsageForEnvironment()
     {
         //TODO - call '_statisticsService'
-        throw new NotImplementedException();
+        // https://softwareengineering.stackexchange.com/questions/345672/c-when-one-should-go-for-factory-method-pattern-instead-of-factory-pattern
+        // use 'ShipperFactory.CreateInstance(...)'
+        var  res = await _statisticsService.GetCpuUsageData();
+        return res;
     }
 }
